@@ -1,7 +1,6 @@
 package sample;
 
 import java.io.File;
-import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -31,13 +30,10 @@ public class FileExplorerPopup extends Stage {
     private Button fileChooserButton = new Button("Choose File:");
     private Button confirmButton = new Button("Analyze File");
 
-    private final int SPACING = 10;
-
-
     private File selectedFile = null;
 
 
-    public FileExplorerPopup(){
+    public FileExplorerPopup() {
 
         //Setup Components
         titleLabel.setFont(titleFont);
@@ -63,12 +59,12 @@ public class FileExplorerPopup extends Stage {
 
 
         //Setup Layouts
-        root.setSpacing(1.5 * SPACING);
-        root.setPadding(new Insets(SPACING));
+        root.setSpacing(1.5 * Main.SPACING);
+        root.setPadding(new Insets(Main.SPACING, 2 * Main.SPACING, 1.25 * Main.SPACING, 2 * Main.SPACING));
         root.setAlignment(Pos.CENTER);
 
         fileChooserLayout.setAlignment(Pos.CENTER);
-        fileChooserLayout.setSpacing(2 * SPACING);
+        fileChooserLayout.setSpacing(2 * Main.SPACING);
         fileChooserLayout.getChildren().addAll(fileChooserButton, chosenFileLabel);
         root.getChildren().addAll(titleLabel, fileChooserLayout, confirmButton);
 

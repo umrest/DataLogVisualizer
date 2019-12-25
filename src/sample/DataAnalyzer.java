@@ -6,9 +6,12 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.TreeMap;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 public class DataAnalyzer extends Stage {
@@ -16,17 +19,36 @@ public class DataAnalyzer extends Stage {
     private TreeMap<Integer, ArrayList<Motor>> motorMap = new TreeMap<Integer, ArrayList<Motor>>();
 
     private VBox root = new VBox();
-    private Scene scene = new Scene(root);
+    private Scene scene;
 
+    private Text titleLabel = new Text("Motor List");
     private ListView<String> listView = new ListView<>();
 
     public DataAnalyzer(File selectedFile) {
         loadFromFile(selectedFile);
 
 
+        for (Integer keys : motorMap.keySet()) {
+            listView.getItems().add("Motor ID: " + keys.toString());
+        }
 
-        root.getChildren().add(listView);
+        double cellHeight = Font.getDefault().getSize() * 2.5;
+        listView.setFixedCellSize(cellHeight);
 
+        listView.setMaxHeight(15 * cellHeight);
+        listView.setPrefHeight(motorMap.size() * cellHeight);
+
+
+
+        root.getChildren().addAll(titleLabel, listView);
+
+
+        root.setPadding(new Insets(Main.SPACING, 2 * Main.SPACING, 1.25 * Main.SPACING, 2 * Main.SPACING));
+        scene = new Scene(root);
+
+        setScene(scene);
+        sizeToScene();
+        show();
 
     }
 
@@ -67,7 +89,7 @@ public class DataAnalyzer extends Stage {
 
         Motor motor = new Motor(CAN_ID, percentVBus, currentDraw, encoderPosition, encoderVelocity);
 
-        if(!motorMap.containsKey(CAN_ID)) motorMap.put(CAN_ID, new ArrayList<Motor>());
+        if (!motorMap.containsKey(CAN_ID)) motorMap.put(CAN_ID, new ArrayList<Motor>());
         motorMap.get(CAN_ID).add(motor);
     }
 

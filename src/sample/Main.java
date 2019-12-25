@@ -6,6 +6,8 @@ import javafx.stage.Stage;
 public class Main extends Application {
 
     public static final String DATA_FILE_EXT = "REST_DATA";
+    public static final int SPACING = 10;
+
 
     public static void main(String[] args) {
         Application.launch(Main.class, args);
