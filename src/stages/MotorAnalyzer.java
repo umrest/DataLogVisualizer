@@ -2,6 +2,8 @@ package stages;
 
 import dataObjects.Motor;
 import java.util.ArrayList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -10,6 +12,7 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -30,12 +33,16 @@ public class MotorAnalyzer extends Stage {
     private HBox root = new HBox();
     private VBox optionsLayout = new VBox();
     private Button backButton = new Button("Back");
-    private Button updateButton = new Button("Update Chart");
     private ComboBox<String> motorSelector = new ComboBox<String>();
+
+    //Graphs
+    private GridPane graphGridPane = new GridPane();
     private LineChart VBUSGraph;
     private LineChart currentDrawGraph;
     private LineChart encoderPositionGraph;
     private LineChart encoderVelocityGraph;
+
+    //Other
     private Scene scene;
 
 
@@ -50,21 +57,37 @@ public class MotorAnalyzer extends Stage {
         for (Motor motor : motorList)
             if (motor.isActive()) motorSelector.getItems().add(COMBO_BOX_MOTOR_NAME_PREFIX + motor.getCAN_ID());
 
+        motorSelector.getSelectionModel().selectFirst();
 
-        optionsLayout.getChildren().addAll(backButton, updateButton, motorSelector);
+        motorSelector.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                newMotorSelected(motorSelector.getSelectionModel().getSelectedItem());
+            }
+        });
+
+        backButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                hide();
+
+                FileExplorerPopup popup = new FileExplorerPopup();
+            }
+        });
+
+
+        optionsLayout.getChildren().addAll(backButton, motorSelector);
         optionsLayout.setAlignment(Pos.TOP_CENTER);
         optionsLayout.setSpacing(Main.SPACING);
         optionsLayout.setPadding(new Insets(Main.SPACING));
 
         root.getChildren().add(optionsLayout);
 
+
         newMotorSelected(motorSelector.getItems().get(0));
 
-        //Create and add the chart
-        VBUSGraph = generateGraph(VBUS);
 
-
-
+        root.getChildren().add(graphGridPane);
 
         //Scene cleanup
         root.setPadding(new Insets(1.5 * Main.SPACING));
@@ -79,9 +102,17 @@ public class MotorAnalyzer extends Stage {
         motorName = motorName.substring(COMBO_BOX_MOTOR_NAME_PREFIX.length());
         int CAN_ID = Integer.valueOf(motorName);
         currentMotor = motorList.get(CAN_ID);
+        graphGridPane.getChildren().removeAll(VBUSGraph, currentDrawGraph, encoderPositionGraph, encoderVelocityGraph);
 
+
+        //Create and add the chart
         VBUSGraph = generateGraph(VBUS);
-        root.getChildren().add(VBUSGraph);
+        currentDrawGraph = generateGraph(CURRENT_DRAW);
+        encoderPositionGraph = generateGraph(ENCODER_POS);
+        encoderVelocityGraph = generateGraph(ENCODER_VEL);
+
+        graphGridPane.addRow(0, VBUSGraph, currentDrawGraph);
+        graphGridPane.addRow(1, encoderPositionGraph, encoderVelocityGraph);
 
     }
 
@@ -92,6 +123,15 @@ public class MotorAnalyzer extends Stage {
         switch (graphTitle) {
             case VBUS:
                 graphData = currentMotor.getPercentVBusList();
+                break;
+            case CURRENT_DRAW:
+                graphData = currentMotor.getCurrentDrawList();
+                break;
+            case ENCODER_POS:
+                graphData = currentMotor.getEncoderPositionList();
+                break;
+            case ENCODER_VEL:
+                graphData = currentMotor.getEncoderVelocityList();
                 break;
         }
 

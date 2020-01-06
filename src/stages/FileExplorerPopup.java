@@ -138,7 +138,11 @@ public class FileExplorerPopup extends Stage {
                     default:
                         System.err.println("Character identifier (" + items[0].charAt(0) + ") not recognized!");
                 }
+
             }
+
+            scanner.close();
+
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }

@@ -14,12 +14,11 @@ int main() {
 	outfile.open("exampleData.REST_DATA");
 
 	outfile << "#<DATUM_ID,CAN_ID,PERCENT_VBUS,CURRENT_DRAW,ENCODER_POS,ENCODER_VEL>\n";
-	int can = 33;
-	//for (int can = 1; can < 53; can++) {
+	for (int can = 1; can < 53; can++) {
 		for (int i = 0; i < 100; i++) {
-			outfile << "M," << can << "," << (i / 100) << "," << i%can << "," << i << "," << i << '\n';
+			outfile << "M," << can << "," << (i / 10) << "," << + i * can << "," << i << "," << i << '\n';
 		}
-	//}
+	}
 
 
 	outfile.close();
