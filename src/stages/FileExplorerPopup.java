@@ -47,7 +47,7 @@ public class FileExplorerPopup extends Stage {
 
 
         //HHHHHHHHHHHHHHHHHHHHHHHHHHEEEEEEEEEEEEEEEEEEEERRRRRRRRRRRRRRRRRRRRRRREEEEEEEEEEEEEEEEEE
-        //confirmButton.setDisable(true);
+        //confirmButton.setDisable(true); // Also remove the default file from the global field File file
 
         //ActionEvents
         fileChooserButton.setOnAction(new EventHandler<ActionEvent>() {
