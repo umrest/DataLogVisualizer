@@ -1,6 +1,10 @@
 package stages;
 
+import dataObjects.Motor;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Scanner;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -17,14 +21,11 @@ import javafx.stage.Stage;
 public class FileExplorerPopup extends Stage {
 
 
+    private static final String TITLE = "Select a \"" + Main.DATA_FILE_EXT + "\" file to load";
+    private static final String NO_FILE_CHOSEN = "No File Chosen";
     private VBox root = new VBox();
     private HBox fileChooserLayout = new HBox();
-
-    private static final String TITLE = "Select a \"" + Main.DATA_FILE_EXT + "\" file to load";
     private Text titleLabel = new Text(TITLE);
-
-
-    private static final String NO_FILE_CHOSEN = "No File Chosen";
     private Text chosenFileLabel = new Text(NO_FILE_CHOSEN);
     private Button fileChooserButton = new Button("Choose File:");
     private Button confirmButton = new Button("Analyze File");
@@ -103,8 +104,46 @@ public class FileExplorerPopup extends Stage {
 
     private void confirmAction(File selectedFile) {
         hide();
+        ArrayList<Motor> motorList = loadFromFile(selectedFile);
+        MotorAnalyzer motorAnalyzer = new MotorAnalyzer(motorList);
+    }
 
-        MotorSelector dataAnalyzer = new MotorSelector(selectedFile);
+    private ArrayList<Motor> loadFromFile(File selectedFile) {
+
+        ArrayList<Motor> motorDataList = new ArrayList<>(100);
+        for (int i = 0; i < 100; i++) motorDataList.add(new Motor(i));
+
+        try {
+            Scanner scanner = new Scanner(selectedFile);
+
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                String[] items = line.split(",");
+
+                switch (items[0].charAt(0)) {
+                    case '#':
+                        //Comment line, ignore
+                        break;
+
+                    case Motor.CHARACTER_ID:
+                        int CAN_ID = Integer.valueOf(items[1]);
+                        float percentVBus = Float.valueOf(items[2]);
+                        float currentDraw = Float.valueOf(items[3]);
+                        float encoderPosition = Float.valueOf(items[4]);
+                        float encoderVelocity = Float.valueOf(items[5]);
+
+                        motorDataList.get(CAN_ID).addData(percentVBus, currentDraw, encoderPosition, encoderVelocity);
+                        break;
+
+                    default:
+                        System.err.println("Character identifier (" + items[0].charAt(0) + ") not recognized!");
+                }
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return motorDataList;
     }
 
 
